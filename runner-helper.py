@@ -34,29 +34,34 @@ download_command_template = "s5cmd cp s3://exa4mind/"+data_upload_name+"/"
 data_path = path_prefix+"download"
 for record in list:
     download_command = download_command_template+record+" "+data_path+"/."
-    #os.system(download_command)
+    os.system(download_command)
 
     os.chdir(data_path)
 
-    os.system("7z e "+record)
+    os.system("unzip {}".format(record))
     for suffix in extractionSuffixes:
-        os.system("7z e "+record.replace(".zip","")+suffix+" -o"+record.replace(".zip","")+suffix.replace(".zip",""))
+        os.system(
+            "unzip {} -d {} ".format(
+                                        record.replace(".zip","")+suffix,
+                                        record.replace(".zip","")+suffix.replace(".zip","")
+                                    )
+        )
 
 
 
 
     os.chdir("./../../../")
 
-    os.system("conda run -n lavis python lavis-local.py "+partition_id+" "+data_upload_name)
+    os.system("conda run -n clip python clip-local.py "+partition_id+" "+data_upload_name)
 
 
-    """
-    for root, dirs, files in os.walk(datapath, topdown=False):
+    
+    for root, dirs, files in os.walk(data_path, topdown=False):
         for name in files:
             os.remove(os.path.join(root, name))
         for name in dirs:
             os.rmdir(os.path.join(root, name))
-    """
+    
 
-    exit()
+exit()
 

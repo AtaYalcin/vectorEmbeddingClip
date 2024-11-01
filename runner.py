@@ -1,6 +1,6 @@
 
 # start of configuration
-partition_count = 5  # edit this number wrt. your gpu capabilities
+partition_count = 1  # edit this number wrt. your gpu capabilities
 data_upload_name = "20240205"
 # set the environment variables AWS_REGION, AWS_SECRET_ACCESS_KEY, AWS_ACCESS_KEY_ID, S3_ENDPOINT_URL=https://s3.lexis.tech
 #dont forget to configure runner-helper.py
@@ -42,7 +42,7 @@ if os.path.exists(result_directory):
 os.mkdir(result_directory)
 
 
-"""
+
 internal_directory_deletable = "./internal-directory-deletable"
 if os.path.exists(internal_directory_deletable):
     for root, dirs, files in os.walk(internal_directory_deletable, topdown=False):
@@ -60,12 +60,20 @@ for i in range(partition_count):
     with open(internal_directory_deletable+"/"+str(i)+"/"+"list-within-partition.txt", "w") as file:
         file.writelines(partition_list[i])
         file.close()
-"""
+
 for i in range(partition_count):
     p = subprocess.Popen(['conda', 'run', '-n', 's5cmdEnv', 'python', 'runner-helper.py', str(i), data_upload_name])
 
 
 
+if partition_count > 0:
+    while p.poll() is None:
+        time.sleep(1)
+else:
+    print("ERR:no partitions exist")
+
+
+"""
 screen_clear_command = "clear"
 if os.name == 'nt':
     screen_clear_command = "cls"
@@ -79,3 +87,5 @@ if partition_count > 0:
         time.sleep(1)
 else:
     print("ERR:no partitions exist")
+
+"""
